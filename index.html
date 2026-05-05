@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Design System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --accent: #0066cc;
+      --accent-bright: #2997ff;
+      --black: #000000;
+      --near-black: #1d1d1f;
+      --dark-tile: #272729;
+      --white: #ffffff;
+      --parchment: #f5f5f7;
+      --muted: rgba(255,255,255,0.55);
+      --font: 'Pretendard Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #000;
+      font-family: var(--font);
+      overflow: hidden;
+    }
+
+    /* ── Progress bar ── */
+    #progress {
+      position: fixed; top: 0; left: 0; height: 2px;
+      background: var(--accent); z-index: 100;
+      transition: width 0.3s ease;
+    }
+
+    /* ── Counter ── */
+    #counter {
+      position: fixed; bottom: 22px; right: 32px;
+      font-size: 11px; letter-spacing: 1px;
+      color: rgba(255,255,255,0.35);
+      font-family: 'JetBrains Mono', monospace;
+      z-index: 100;
+    }
+
+    /* ── Hint ── */
+    .hint {
+      position: fixed; bottom: 22px; left: 32px;
+      font-size: 11px; color: rgba(255,255,255,0.25);
+      z-index: 100; letter-spacing: 0.5px;
+    }
+
+    /* ── Fullscreen btn ── */
+    #fs-btn {
+      position: fixed; top: 20px; right: 32px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.5); font-size: 13px;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      z-index: 100; font-family: var(--font);
+      transition: background 0.2s;
+    }
+    #fs-btn:hover { background: rgba(255,255,255,0.14); }
+
+    /* ── Slides ── */
+    #deck {
+      position: relative; width: 100%; height: 100%;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 64px 96px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active {
+      opacity: 1; pointer-events: auto; z-index: 2;
+    }
+
+    /* slide variants */
+    .slide-dark   { background: var(--black); color: var(--white); }
+    .slide-tile   { background: var(--dark-tile); color: var(--white); }
+    .slide-gradient {
+      background: linear-gradient(145deg, #0a0a0f 0%, #0d1b40 50%, #071428 100%);
+      color: var(--white);
+    }
+    .slide-light  { background: var(--parchment); color: var(--near-black); }
+
+    /* stagger */
+    .slide.active .a {
+      opacity: 0;
+      animation: fadeUp 0.45s ease forwards;
+    }
+    .a:nth-child(1) { animation-delay: 0.05s; }
+    .a:nth-child(2) { animation-delay: 0.12s; }
+    .a:nth-child(3) { animation-delay: 0.19s; }
+    .a:nth-child(4) { animation-delay: 0.26s; }
+    .a:nth-child(5) { animation-delay: 0.33s; }
+    .a:nth-child(6) { animation-delay: 0.40s; }
+    .a:nth-child(7) { animation-delay: 0.47s; }
+    .a:nth-child(8) { animation-delay: 0.54s; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* typography helpers */
+    .overline {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent-bright); font-weight: 500; margin-bottom: 20px;
+    }
+    .xl { font-size: 72px; font-weight: 800; line-height: 1.05; letter-spacing: -1.5px; }
+    .lg { font-size: 52px; font-weight: 700; line-height: 1.08; letter-spacing: -0.8px; }
+    .md { font-size: 36px; font-weight: 600; line-height: 1.2; letter-spacing: -0.3px; }
+    .sm { font-size: 20px; font-weight: 400; line-height: 1.6; }
+    .xs { font-size: 15px; line-height: 1.6; }
+    .text-gradient {
+      background: linear-gradient(135deg, #2997ff 0%, #0066cc 60%, #5ac8fa 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .text-muted { color: var(--muted); }
+    .accent { color: var(--accent-bright); }
+
+    /* ─── Slide-specific layouts ─── */
+
+    /* Title */
+    .title-eyebrow {
+      font-size: 12px; letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 28px; font-weight: 400;
+    }
+    .title-sub {
+      margin-top: 24px;
+      font-size: 22px; font-weight: 300; color: rgba(255,255,255,0.6);
+      letter-spacing: 0.2px;
+    }
+    .title-meta {
+      margin-top: 60px;
+      font-size: 12px; color: rgba(255,255,255,0.25);
+      letter-spacing: 1px;
+    }
+
+    /* Agenda */
+    .agenda-list {
+      margin-top: 40px; text-align: left;
+      display: flex; flex-direction: column; gap: 14px;
+      width: 100%; max-width: 560px;
+    }
+    .agenda-item {
+      display: flex; align-items: center; gap: 20px;
+      padding: 14px 20px; border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+    .agenda-num {
+      font-size: 11px; font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-bright); letter-spacing: 1px; min-width: 24px;
+    }
+    .agenda-text { font-size: 16px; font-weight: 500; }
+
+    /* Key message */
+    .key-msg-quote {
+      font-size: 42px; font-weight: 700; line-height: 1.2;
+      letter-spacing: -0.5px; max-width: 700px;
+    }
+    .key-msg-sub {
+      margin-top: 28px; font-size: 17px; color: var(--muted); max-width: 500px;
+    }
+
+    /* Section divider */
+    .section-num {
+      font-size: 100px; font-weight: 900; line-height: 1;
+      color: rgba(255,255,255,0.04); font-family: 'JetBrains Mono', monospace;
+      position: absolute; top: 40px; left: 60px;
+    }
+    .section-label {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent-bright); margin-bottom: 16px;
+    }
+    .section-title { font-size: 52px; font-weight: 700; letter-spacing: -0.8px; }
+    .section-desc { margin-top: 16px; font-size: 17px; color: var(--muted); }
+
+    /* Color swatches */
+    .swatch-row {
+      display: flex; gap: 16px; margin-top: 36px; justify-content: center;
+      flex-wrap: wrap;
+    }
+    .swatch {
+      width: 120px; border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .swatch-color { height: 70px; }
+    .swatch-info {
+      padding: 10px 12px; background: rgba(255,255,255,0.05);
+      text-align: left;
+    }
+    .swatch-name { font-size: 12px; font-weight: 600; color: #fff; }
+    .swatch-hex  { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* Typography table */
+    .type-table {
+      margin-top: 32px; width: 100%; max-width: 700px;
+      border-collapse: separate; border-spacing: 0 8px;
+    }
+    .type-table th {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); font-weight: 500; padding: 0 16px 8px;
+      text-align: left;
+    }
+    .type-table td {
+      padding: 12px 16px; background: rgba(255,255,255,0.04);
+      font-size: 14px; color: rgba(255,255,255,0.85);
+    }
+    .type-table tr td:first-child { border-radius: 8px 0 0 8px; }
+    .type-table tr td:last-child  { border-radius: 0 8px 8px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-bright); }
+    .type-sample { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; color: #fff; }
+
+    /* Layout diagram */
+    .layout-pills {
+      display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pill-tag {
+      padding: 10px 20px; border-radius: 999px;
+      font-size: 14px; font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.05);
+    }
+    .layout-tiles {
+      display: flex; gap: 4px; margin-top: 32px;
+    }
+    .layout-tile {
+      height: 140px; border-radius: 4px; flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    }
+    .t-light { background: #f5f5f7; color: #1d1d1f; }
+    .t-dark  { background: #272729; color: rgba(255,255,255,0.7); }
+
+    /* Shadow demo */
+    .shadow-demo {
+      display: flex; gap: 48px; margin-top: 40px; align-items: flex-end;
+    }
+    .shadow-box {
+      width: 160px; height: 100px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+    }
+    .shadow-none { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); }
+    .shadow-product {
+      background: linear-gradient(145deg, #2a2a2c, #1a1a1c);
+      box-shadow: rgba(0,0,0,0.22) 3px 5px 30px 0;
+      color: #fff;
+    }
+    .shadow-label { font-size: 11px; color: var(--muted); margin-top: 12px; text-align: center; }
+
+    /* Buttons */
+    .btn-showcase {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      justify-content: center; margin-top: 36px; align-items: center;
+    }
+    .btn-demo {
+      padding: 12px 24px; font-size: 16px; font-family: var(--font); font-weight: 400;
+      cursor: default;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff; border-radius: 999px; border: none;
+    }
+    .btn-ghost {
+      background: transparent; color: var(--accent-bright); border: 1px solid var(--accent-bright);
+      border-radius: 999px;
+    }
+    .btn-dark {
+      background: #1d1d1f; color: #fff; border-radius: 8px; border: none;
+      font-size: 13px; padding: 8px 16px;
+    }
+    .btn-press {
+      transform: scale(0.95);
+    }
+    .btn-label { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center; }
+    .btn-col { display: flex; flex-direction: column; align-items: center; }
+
+    /* Components grid */
+    .comp-cards {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; margin-top: 36px; width: 100%;
+    }
+    .comp-card {
+      padding: 24px; border-radius: 16px; text-align: left;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+    }
+    .comp-icon { font-size: 28px; margin-bottom: 12px; }
+    .comp-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .comp-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Do / Don't */
+    .dos-donts {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px; margin-top: 36px; width: 100%;
+    }
+    .dos, .donts {
+      padding: 28px; border-radius: 16px; text-align: left;
+    }
+    .dos   { background: rgba(0,102,204,0.08); border: 1px solid rgba(0,102,204,0.3); }
+    .donts { background: rgba(255,59,48,0.06); border: 1px solid rgba(255,59,48,0.2); }
+    .dos-title   { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 16px; letter-spacing: 0.5px; }
+    .donts-title { font-size: 14px; font-weight: 700; color: #ff3b30; margin-bottom: 16px; letter-spacing: 0.5px; }
+    .rule-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .rule-list li { font-size: 14px; color: var(--near-black); line-height: 1.5; display: flex; gap: 8px; }
+    .rule-list li::before { flex-shrink: 0; }
+    .dos .rule-list li::before   { content: "✓"; color: var(--accent); }
+    .donts .rule-list li::before { content: "✗"; color: #ff3b30; }
+
+    /* Responsive breakpoints */
+    .breakpoints {
+      display: flex; align-items: flex-end; gap: 12px;
+      margin-top: 40px; justify-content: center;
+    }
+    .bp {
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: flex-end; padding-bottom: 12px;
+      min-width: 72px;
+    }
+    .bp-label { font-size: 10px; color: rgba(255,255,255,0.8); font-family: 'JetBrains Mono', monospace; }
+    .bp-px    { font-size: 9px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    /* Flow */
+    .flow-row {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 40px;
+    }
+    .flow-step {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px;
+    }
+    .flow-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(41,151,255,0.12); border: 1px solid rgba(41,151,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .flow-name { font-size: 13px; font-weight: 600; }
+    .flow-arrow { font-size: 22px; color: rgba(255,255,255,0.2); }
+
+    /* Closing */
+    .closing-line {
+      width: 48px; height: 2px; background: var(--accent-bright);
+      margin: 24px auto;
+    }
+    .closing-links {
+      display: flex; gap: 32px; margin-top: 48px; justify-content: center;
+    }
+    .closing-link {
+      font-size: 13px; color: var(--accent-bright); text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* Print / PDF */
+    @media print {
+      .hint, #counter, #fs-btn, #progress { display: none !important; }
+      .slide {
+        page-break-after: always; position: relative !important;
+        opacity: 1 !important; display: flex !important;
+        width: 100vw; height: 100vh;
+      }
+      @page { size: landscape; margin: 0; }
+    }
+
+    /* Responsive scale */
+    @media (max-width: 900px) {
+      .xl { font-size: 44px; }
+      .lg { font-size: 34px; }
+      .slide { padding: 40px 40px; }
+      .comp-cards { grid-template-columns: 1fr; }
+      .dos-donts  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="counter"></div>
+<button id="fs-btn" onclick="toggleFullscreen()">⛶ Full</button>
+<div class="hint">← → Navigate · F Fullscreen · S Notes</div>
+
+<div id="deck">
+
+  <!-- 1. TITLE -->
+  <div class="slide slide-dark active"
+       data-notes="안녕하세요. 오늘은 Apple의 웹 디자인 시스템을 살펴봅니다. Apple은 단순히 제품을 파는 것이 아니라, 사진 중심의 갤러리 경험을 만듭니다. UI가 보이지 않을 때 제품이 가장 빛납니다. 이 발표는 그 철학과 실제 토큰 시스템을 다룹니다. [약 15분 소요]">
+    <div class="title-eyebrow a">Design System Analysis</div>
+    <h1 class="xl text-gradient a">Apple<br>Design System</h1>
+    <p class="title-sub a">사진 중심의 UI 철학, 토큰 시스템, 컴포넌트 아키텍처</p>
+    <div class="title-meta a">Apple Web Design · 2026</div>
+  </div>
+
+  <!-- 2. AGENDA -->
+  <div class="slide slide-dark"
+       data-notes="오늘 다룰 주제는 6가지입니다. 컬러, 타이포그래피, 레이아웃, 그림자, 컴포넌트, 그리고 반응형 전략입니다. 순서대로 살펴보겠습니다.">
+    <p class="overline a">목차</p>
+    <h2 class="lg a">오늘의 주제</h2>
+    <div class="agenda-list a">
+      <div class="agenda-item"><span class="agenda-num">01</span><span class="agenda-text">컬러 시스템 — 단 하나의 액센트 컬러</span></div>
+      <div class="agenda-item"><span class="agenda-num">02</span><span class="agenda-text">타이포그래피 — SF Pro의 Apple Tight 철학</span></div>
+      <div class="agenda-item"><span class="agenda-num">03</span><span class="agenda-text">레이아웃 — 풀블리드 타일과 교차 리듬</span></div>
+      <div class="agenda-item"><span class="agenda-num">04</span><span class="agenda-text">엘리베이션 — 시스템에서 단 하나의 그림자</span></div>
+      <div class="agenda-item"><span class="agenda-num">05</span><span class="agenda-text">컴포넌트 — 버튼, 내비, 타일 아키텍처</span></div>
+      <div class="agenda-item"><span class="agenda-num">06</span><span class="agenda-text">반응형 — 5가지 브레이크포인트 전략</span></div>
+    </div>
+  </div>
+
+  <!-- 3. KEY MESSAGE -->
+  <div class="slide slide-gradient"
+       data-notes="Apple 디자인의 핵심 철학입니다. UI가 보이지 않을 때 제품이 가장 빛납니다. 이 한 문장이 모든 디자인 결정을 설명합니다. 그림자 없음, 그라디언트 없음, 두 번째 액센트 컬러 없음. 모든 장식은 제품 사진으로부터 나옵니다.">
+    <p class="section-label a">Core Philosophy</p>
+    <div class="key-msg-quote a">
+      "UI가 <span class="text-gradient">보이지 않을 때</span>,<br>제품이 빛난다."
+    </div>
+    <p class="key-msg-sub a">모든 장식을 제거하고, 제품 사진이 말하게 하라.<br>그것이 Apple 디자인의 출발점이다.</p>
+  </div>
+
+  <!-- 4. COLOR SYSTEM -->
+  <div class="slide slide-dark"
+       data-notes="컬러 시스템의 핵심은 단 하나의 인터랙티브 컬러입니다. Action Blue #0066cc — 링크, 버튼, 포커스 링 모두 이 색입니다. 두 번째 브랜드 컬러는 존재하지 않습니다. 서피스는 흰색, 파치먼트, 다크 타일 세 가지로만 구성됩니다.">
+    <p class="overline a">01 · Color System</p>
+    <h2 class="md a">단 하나의 인터랙티브 컬러</h2>
+    <div class="swatch-row a">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0066cc;"></div>
+        <div class="swatch-info"><div class="swatch-name">Action Blue</div><div class="swatch-hex">#0066cc</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#ffffff; border-bottom:1px solid rgba(0,0,0,0.1);"></div>
+        <div class="swatch-info"><div class="swatch-name">Canvas</div><div class="swatch-hex">#ffffff</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f5f5f7; border-bottom:1px solid rgba(0,0,0,0.1);"></div>
+        <div class="swatch-info"><div class="swatch-name">Parchment</div><div class="swatch-hex">#f5f5f7</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1d1d1f;"></div>
+        <div class="swatch-info"><div class="swatch-name">Ink</div><div class="swatch-hex">#1d1d1f</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#272729;"></div>
+        <div class="swatch-info"><div class="swatch-name">Dark Tile</div><div class="swatch-hex">#272729</div></div>
+      </div>
+    </div>
+    <p class="xs text-muted a" style="margin-top:20px;">다크 서피스에서 링크는 <span class="accent">#2997ff</span>로 전환 — Action Blue는 어두운 배경에서 사라지기 때문</p>
+  </div>
+
+  <!-- 5. TYPOGRAPHY -->
+  <div class="slide slide-dark"
+       data-notes="타이포그래피 시스템의 핵심은 세 가지입니다. 첫째, 디스플레이 사이즈에서 네거티브 자간 — Apple Tight 느낌을 만듭니다. 둘째, 바디 카피는 17px — 16px이 아닙니다. 이 1px 차이가 '읽기' 속도를 만듭니다. 셋째, 웨이트 사다리는 300/400/600/700 — 500은 의도적으로 없습니다.">
+    <p class="overline a">02 · Typography</p>
+    <h2 class="md a">Apple Tight 타이포그래피</h2>
+    <table class="type-table a">
+      <thead>
+        <tr>
+          <th>Token</th><th>Sample</th><th>Size / Weight</th><th>Letter Spacing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="a">
+          <td>hero-display</td>
+          <td><span class="type-sample" style="font-size:28px;font-weight:800;">Hero</span></td>
+          <td>56px / 600</td>
+          <td>-0.28px</td>
+        </tr>
+        <tr class="a">
+          <td>display-lg</td>
+          <td><span class="type-sample" style="font-size:22px;font-weight:600;">Display</span></td>
+          <td>40px / 600</td>
+          <td>0</td>
+        </tr>
+        <tr class="a">
+          <td>body</td>
+          <td><span class="type-sample" style="font-size:17px;font-weight:400;">Body copy</span></td>
+          <td>17px / 400</td>
+          <td>-0.374px</td>
+        </tr>
+        <tr class="a">
+          <td>caption</td>
+          <td><span class="type-sample" style="font-size:14px;font-weight:400;">Caption</span></td>
+          <td>14px / 400</td>
+          <td>-0.224px</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="xs text-muted a" style="margin-top:16px;">웨이트 사다리: <span class="accent">300 / 400 / 600 / 700</span> — 500은 의도적으로 없음</p>
+  </div>
+
+  <!-- 6. LAYOUT PHILOSOPHY -->
+  <div class="slide slide-dark"
+       data-notes="레이아웃의 핵심은 풀블리드 타일입니다. 타일들은 가장자리에 닿으며, 타일 사이의 구분선은 없습니다. 대신 컬러 변화 자체가 구분선이 됩니다. 라이트 타일과 다크 타일이 교차하며 리듬을 만들어냅니다. 각 타일은 80px 상하 패딩으로 공간을 확보합니다.">
+    <p class="overline a">03 · Layout</p>
+    <h2 class="md a">타일 교차 리듬</h2>
+    <div class="layout-tiles a">
+      <div class="layout-tile t-light" style="height:100px;">Light</div>
+      <div class="layout-tile t-dark"  style="height:100px;">Dark</div>
+      <div class="layout-tile t-light" style="height:100px;">Light</div>
+      <div class="layout-tile t-dark"  style="height:100px;">Dark</div>
+      <div class="layout-tile" style="height:100px;background:#f5f5f7;color:#1d1d1f;">Parchment</div>
+    </div>
+    <div class="layout-pills a">
+      <span class="pill-tag">80px 섹션 패딩</span>
+      <span class="pill-tag">경계선 없음</span>
+      <span class="pill-tag">컬러 변화 = 구분선</span>
+      <span class="pill-tag">최대 1440px</span>
+    </div>
+  </div>
+
+  <!-- 7. ELEVATION & SHADOW -->
+  <div class="slide slide-gradient"
+       data-notes="Apple 디자인 시스템에는 단 하나의 드롭쉐도우만 존재합니다. 그것도 제품 이미지에만 사용됩니다. 카드, 버튼, 텍스트에는 절대 그림자를 사용하지 않습니다. UI의 깊이는 서피스 컬러 변화와 백드롭 블러로만 표현합니다.">
+    <p class="section-label a">04 · Elevation</p>
+    <h2 class="lg a">시스템 전체에<br><span class="text-gradient">단 하나</span>의 그림자</h2>
+    <div class="shadow-demo a">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="shadow-box shadow-none">Card</div>
+        <div class="shadow-label">카드 → 그림자 없음</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="shadow-box shadow-none" style="border-radius:999px;height:48px;width:140px;">Button</div>
+        <div class="shadow-label">버튼 → 그림자 없음</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="shadow-box shadow-product">📱 Product</div>
+        <div class="shadow-label" style="color:var(--accent-bright);">제품 이미지 → 유일한 그림자</div>
+      </div>
+    </div>
+    <p class="xs text-muted a" style="margin-top:20px;"><code style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);">rgba(0,0,0,0.22) 3px 5px 30px 0</code></p>
+  </div>
+
+  <!-- 8. BUTTON SYSTEM -->
+  <div class="slide slide-dark"
+       data-notes="Apple의 버튼 시스템은 두 가지 문법으로 구성됩니다. 첫째, 필 모양 - 기본 CTA와 검색 입력에 사용. 둘째, 컴팩트 직사각형 - 유틸리티 버튼에 사용. 모든 버튼의 프레스 상태는 transform: scale(0.95) 하나로 통일됩니다.">
+    <p class="overline a">05 · Buttons</p>
+    <h2 class="md a">두 가지 버튼 문법</h2>
+    <div class="btn-showcase a">
+      <div class="btn-col">
+        <button class="btn-demo btn-primary">Learn more</button>
+        <div class="btn-label">Primary Pill<br>#0066cc · pill radius</div>
+      </div>
+      <div class="btn-col">
+        <button class="btn-demo btn-ghost">Buy</button>
+        <div class="btn-label">Ghost Pill<br>transparent · blue border</div>
+      </div>
+      <div class="btn-col">
+        <button class="btn-demo btn-dark">Sign In</button>
+        <div class="btn-label">Dark Utility<br>#1d1d1f · 8px radius</div>
+      </div>
+      <div class="btn-col">
+        <button class="btn-demo btn-primary btn-press">Press</button>
+        <div class="btn-label">Active State<br>scale(0.95) — 공통</div>
+      </div>
+    </div>
+    <p class="xs text-muted a" style="margin-top:24px;">검색 입력도 필 모양 — "액션"을 나타내는 모든 요소에 pill radius 적용</p>
+  </div>
+
+  <!-- 9. COMPONENT ARCHITECTURE -->
+  <div class="slide slide-tile"
+       data-notes="컴포넌트 아키텍처는 세 레이어로 구성됩니다. 내비게이션, 제품 타일, 유틸리티 카드입니다. 내비는 글로벌(블랙, 44px)과 서브(파치먼트+블러, 52px) 두 개가 쌓입니다. 제품 타일은 풀블리드로 뷰포트 전체를 차지합니다. 유틸리티 카드는 18px 라운드 코너를 가집니다.">
+    <p class="overline a">05 · Components</p>
+    <h2 class="md a">컴포넌트 아키텍처</h2>
+    <div class="comp-cards a">
+      <div class="comp-card">
+        <div class="comp-icon">🧭</div>
+        <div class="comp-title">Global Nav</div>
+        <div class="comp-desc">Pure Black #000 · 44px height · 12px SF Pro Text · 모든 페이지 공통</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">🪟</div>
+        <div class="comp-title">Sub-nav Frosted</div>
+        <div class="comp-desc">Parchment 80% + backdrop-blur · 52px · 카테고리명 + CTA</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">🖼</div>
+        <div class="comp-title">Product Tile</div>
+        <div class="comp-desc">풀블리드 · radius:0 · 80px 패딩 · 라이트/다크/파치먼트 3종</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">🃏</div>
+        <div class="comp-title">Utility Card</div>
+        <div class="comp-desc">White · 1px hairline border · radius:18px · 24px padding</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">📌</div>
+        <div class="comp-title">Sticky Bar</div>
+        <div class="comp-desc">Parchment 80% + blur · 64px · 하단 고정 · 가격 + CTA</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">🔘</div>
+        <div class="comp-title">Config Chip</div>
+        <div class="comp-desc">Pill radius · 선택 시 2px solid #0071e3 · 14px caption</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. DOS -->
+  <div class="slide slide-light"
+       data-notes="Do와 Don't를 명확히 정리합니다. 가장 중요한 원칙은 단 하나의 액센트 컬러입니다. 두 번째 브랜드 컬러를 추가하는 순간 Apple 디자인 언어가 무너집니다.">
+    <p class="overline a" style="color:var(--accent);">06 · Principles</p>
+    <h2 class="md a" style="color:var(--near-black);">Do's &amp; Don'ts</h2>
+    <div class="dos-donts a">
+      <div class="dos">
+        <div class="dos-title">✓ DO</div>
+        <ul class="rule-list">
+          <li>모든 인터랙티브 요소에 Action Blue(#0066cc) 하나만 사용</li>
+          <li>라이트↔다크 타일 교차로 섹션 리듬 만들기</li>
+          <li>pill radius는 액션 요소에만 (CTA, 검색, 칩)</li>
+          <li>그림자는 제품 이미지에만 적용</li>
+          <li>바디 카피 17px, 1.47 줄간격 유지</li>
+        </ul>
+      </div>
+      <div class="donts">
+        <div class="donts-title">✗ DON'T</div>
+        <ul class="rule-list">
+          <li>두 번째 액센트 컬러 추가 금지</li>
+          <li>카드, 버튼, 텍스트에 그림자 금지</li>
+          <li>배경 그라디언트 사용 금지 (장식 목적)</li>
+          <li>바디 웨이트 500 사용 금지 (400 또는 600)</li>
+          <li>풀블리드 타일에 라운드 코너 금지</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. RESPONSIVE -->
+  <div class="slide slide-dark"
+       data-notes="반응형 전략은 5가지 주요 브레이크포인트를 기준으로 합니다. 1440px에서 콘텐츠가 잠금됩니다. 834px에서 내비가 햄버거로 전환됩니다. 640px에서 단일 컬럼으로 바뀝니다. Hero 타이포는 56px에서 28px까지 단계적으로 줄어듭니다.">
+    <p class="overline a">07 · Responsive</p>
+    <h2 class="md a">5가지 브레이크포인트</h2>
+    <div class="breakpoints a">
+      <div class="bp" style="height:160px;">
+        <div class="bp-label">Desktop</div>
+        <div class="bp-px">1440px</div>
+      </div>
+      <div class="bp" style="height:130px;">
+        <div class="bp-label">Sm Desktop</div>
+        <div class="bp-px">1068px</div>
+      </div>
+      <div class="bp" style="height:100px;">
+        <div class="bp-label">Tablet</div>
+        <div class="bp-px">834px</div>
+      </div>
+      <div class="bp" style="height:72px;">
+        <div class="bp-label">Phone</div>
+        <div class="bp-px">640px</div>
+      </div>
+      <div class="bp" style="height:48px;">
+        <div class="bp-label">Small</div>
+        <div class="bp-px">419px</div>
+      </div>
+    </div>
+    <div class="layout-pills a" style="margin-top:24px;">
+      <span class="pill-tag">내비 → 햄버거 @834px</span>
+      <span class="pill-tag">Hero 56px → 28px</span>
+      <span class="pill-tag">5col → 1col 그리드</span>
+    </div>
+  </div>
+
+  <!-- 12. DESIGN PHILOSOPHY FLOW -->
+  <div class="slide slide-gradient"
+       data-notes="Apple 디자인의 흐름은 단순합니다. 뛰어난 제품 사진 → 보이지 않는 UI → 단 하나의 액션 컬러 → 완벽한 타이포그래피. 이 흐름이 Apple의 웹을 갤러리처럼 만듭니다.">
+    <p class="section-label a">Design Flow</p>
+    <h2 class="lg a">박물관 갤러리처럼</h2>
+    <div class="flow-row a">
+      <div class="flow-step">
+        <div class="flow-icon">📸</div>
+        <div class="flow-name">제품 사진</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">👻</div>
+        <div class="flow-name">보이지 않는 UI</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🔵</div>
+        <div class="flow-name">단일 액센트</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">✍️</div>
+        <div class="flow-name">완벽한 타이포</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🏛</div>
+        <div class="flow-name">갤러리 경험</div>
+      </div>
+    </div>
+    <p class="key-msg-sub a" style="margin-top:32px;">벽이 사라지고, 작품만 남는다.</p>
+  </div>
+
+  <!-- 13. QUOTE -->
+  <div class="slide slide-dark"
+       data-notes="Apple 디자인의 정신을 가장 잘 표현하는 문구입니다. 단순함을 추구하다 보면 결국 복잡함을 이해해야 한다는 역설. Apple은 이 역설을 가장 잘 구현한 회사입니다.">
+    <div style="font-size:60px;margin-bottom:24px;" class="a">💬</div>
+    <blockquote class="key-msg-quote text-gradient a">
+      "Simplicity is the ultimate sophistication."
+    </blockquote>
+    <p class="sm text-muted a" style="margin-top:20px;">— Leonardo da Vinci · Apple의 첫 번째 마케팅 슬로건</p>
+  </div>
+
+  <!-- 14. CLOSING -->
+  <div class="slide slide-dark"
+       data-notes="오늘 발표를 마칩니다. Apple 디자인 시스템의 핵심은 덜어내기입니다. 덜어내고, 덜어내고, 또 덜어낸 뒤에 남는 것이 바로 Apple입니다. 감사합니다.">
+    <p class="overline a">Apple Design System</p>
+    <h1 class="xl text-gradient a">Thank You.</h1>
+    <div class="closing-line a"></div>
+    <p class="sm text-muted a">덜어내고, 또 덜어내라.</p>
+    <div class="closing-links a">
+      <span class="closing-link">apple-design-system.md</span>
+      <span class="closing-link">make-slide</span>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<script>
+  // Navigation
+  const slides = [...document.querySelectorAll('.slide')];
+  let current = 0;
+
+  function goTo(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[current].classList.remove('active');
+    slides[index].classList.add('active');
+    current = index;
+    updateProgress();
+    updateCounter();
+    updateNotes();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    if (e.key === 'End')  { e.preventDefault(); goTo(slides.length - 1); }
+    if (e.key.toLowerCase() === 'f') toggleFullscreen();
+    if (e.key.toLowerCase() === 's') toggleNotes();
+  });
+
+  // Touch/swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+  });
+
+  // Click navigation
+  document.getElementById('deck').addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+    e.clientX > window.innerWidth / 2 ? goTo(current + 1) : goTo(current - 1);
+  });
+
+  // Progress bar
+  function updateProgress() {
+    document.getElementById('progress').style.width =
+      (current / (slides.length - 1) * 100) + '%';
+  }
+
+  // Counter
+  function updateCounter() {
+    document.getElementById('counter').textContent =
+      (current + 1) + ' / ' + slides.length;
+  }
+
+  // Fullscreen
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  // Speaker Notes (popup)
+  let notesWindow = null;
+
+  function toggleNotes() {
+    if (notesWindow && !notesWindow.closed) {
+      notesWindow.close();
+      notesWindow = null;
+      return;
+    }
+    notesWindow = window.open('', 'SpeakerNotes', 'width=520,height=420,top=80,left=80');
+    notesWindow.document.write(`<!DOCTYPE html>
+<html><head><style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+         background: #111; color: #ddd; padding: 24px; }
+  .sn { font-size: 11px; color: #555; margin-bottom: 12px; font-family: monospace; }
+  .label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+           color: #444; margin-bottom: 8px; }
+  .notes { font-size: 16px; line-height: 1.8; color: #bbb; }
+</style></head><body>
+  <div class="sn" id="sn"></div>
+  <div class="label">Speaker Notes</div>
+  <div class="notes" id="nt"></div>
+</body></html>`);
+    notesWindow.document.close();
+    updateNotes();
+  }
+
+  function updateNotes() {
+    if (!notesWindow || notesWindow.closed) return;
+    try {
+      const note = slides[current].dataset.notes || '(No notes)';
+      notesWindow.document.getElementById('nt').textContent = note;
+      notesWindow.document.getElementById('sn').textContent =
+        'Slide ' + (current + 1) + ' / ' + slides.length;
+    } catch(e) {}
+  }
+
+  // Init
+  updateProgress();
+  updateCounter();
+</script>
+</body>
+</html>
