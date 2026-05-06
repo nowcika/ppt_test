@@ -202,6 +202,87 @@
     .closing-links { display: flex; gap: 32px; margin-top: 48px; justify-content: center; }
     .closing-link { font-size: 13px; color: var(--accent-bright); letter-spacing: 0.5px; }
 
+    /* ── Background Patterns ── */
+    /* circuit: grid lines + dots at 40px offset (PCB feel) */
+    .bg-circuit {
+      background-image:
+        linear-gradient(rgba(41,151,255,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(41,151,255,0.06) 1px, transparent 1px),
+        radial-gradient(circle, rgba(41,151,255,0.22) 1.5px, transparent 1.5px);
+      background-size: 80px 80px, 80px 80px, 80px 80px;
+      background-position: 0 0, 0 0, 40px 40px;
+    }
+    /* dots: evenly spaced dot field */
+    .bg-dots {
+      background-image:
+        radial-gradient(circle, rgba(41,151,255,0.14) 1.5px, transparent 1.5px);
+      background-size: 30px 30px;
+    }
+    /* diagonal: 45° stripe lines */
+    .bg-diagonal {
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent 0, transparent 20px,
+        rgba(41,151,255,0.05) 20px, rgba(41,151,255,0.05) 21px
+      );
+    }
+    /* hex: offset dot grid creating hexagonal feel */
+    .bg-hex {
+      background-image:
+        radial-gradient(circle, rgba(41,151,255,0.16) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(41,151,255,0.16) 1.5px, transparent 1.5px);
+      background-size: 40px 68px, 40px 68px;
+      background-position: 0 0, 20px 34px;
+    }
+    /* concentric rings glow */
+    .bg-rings {
+      background-image:
+        radial-gradient(circle at 50% 50%, transparent 120px, rgba(41,151,255,0.04) 121px, transparent 200px),
+        radial-gradient(circle at 50% 50%, transparent 200px, rgba(41,151,255,0.04) 201px, transparent 300px),
+        radial-gradient(circle at 50% 50%, rgba(41,151,255,0.06) 0, transparent 400px);
+    }
+
+    /* gradient slides: preserve base gradient, add pattern on top */
+    .slide-gradient.bg-dots {
+      background-image:
+        radial-gradient(circle, rgba(41,151,255,0.18) 1.5px, transparent 1.5px),
+        linear-gradient(145deg, #060610 0%, #0c1a3a 50%, #060f24 100%);
+      background-size: 30px 30px, 100% 100%;
+    }
+    .slide-gradient.bg-diagonal {
+      background-image:
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0, transparent 20px,
+          rgba(41,151,255,0.06) 20px, rgba(41,151,255,0.06) 21px
+        ),
+        linear-gradient(145deg, #060610 0%, #0c1a3a 50%, #060f24 100%);
+    }
+    .slide-gradient.bg-rings {
+      background-image:
+        radial-gradient(circle at 50% 50%, transparent 100px, rgba(41,151,255,0.05) 101px, transparent 200px),
+        radial-gradient(circle at 50% 50%, transparent 200px, rgba(41,151,255,0.05) 201px, transparent 340px),
+        radial-gradient(circle at 50% 50%, rgba(41,151,255,0.07) 0, transparent 420px),
+        linear-gradient(145deg, #060610 0%, #0c1a3a 50%, #060f24 100%);
+    }
+
+    /* tile slides */
+    .slide-tile.bg-hex {
+      background-image:
+        radial-gradient(circle, rgba(41,151,255,0.18) 1.5px, transparent 1.5px),
+        radial-gradient(circle, rgba(41,151,255,0.18) 1.5px, transparent 1.5px);
+      background-size: 40px 68px, 40px 68px;
+      background-position: 0 0, 20px 34px;
+    }
+    .slide-tile.bg-diagonal {
+      background-image:
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0, transparent 20px,
+          rgba(41,151,255,0.06) 20px, rgba(41,151,255,0.06) 21px
+        );
+    }
+
     /* Print */
     @media print {
       .hint, #counter, #fs-btn, #progress { display: none !important; }
@@ -228,7 +309,7 @@
 <div id="deck">
 
   <!-- 1. TITLE -->
-  <div class="slide slide-dark active"
+  <div class="slide slide-dark bg-circuit active"
        data-notes="안녕하세요. 오늘은 반도체 산업의 현재와 미래, 그리고 삼성이 나아가야 할 전략적 방향에 대해 살펴봅니다. 2024~2025년은 AI 반도체 붐이 본격화되면서 업계 지형이 빠르게 재편되고 있습니다. 삼성에게는 위기이자 기회의 시간입니다. [약 20분 소요]">
     <div class="title-eyebrow a" style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:28px;">Semiconductor Industry Analysis 2025</div>
     <h1 class="xl text-gradient a">반도체 트렌드와<br>삼성의 미래</h1>
@@ -258,7 +339,7 @@
   </div>
 
   <!-- 3. KEY MESSAGE -->
-  <div class="slide slide-gradient"
+  <div class="slide slide-gradient bg-rings"
        data-notes="반도체 산업의 핵심 메시지입니다. 지금은 AI가 모든 것을 바꾸는 시대입니다. 단순한 메모리 사이클이 아닙니다. AI 연산을 위한 특수 칩 수요가 폭발적으로 증가하면서, '누가 AI 반도체를 장악하느냐'가 산업의 패권을 결정합니다.">
     <p class="section-label a">Core Insight</p>
     <div class="key-quote a">
@@ -270,7 +351,7 @@
   <!-- ─── PART 1: 현황 ─── -->
 
   <!-- 4. MARKET SIZE -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-circuit"
        data-notes="글로벌 반도체 시장 규모입니다. 2024년 약 6,270억 달러로 전년 대비 19% 성장했습니다. AI 반도체 수요가 주된 동인입니다. 2030년에는 1조 달러를 돌파할 것으로 전망됩니다. 특히 AI 가속기 시장은 2023년 대비 3배 이상 성장 중입니다.">
     <p class="overline a">01 · 현황 — 시장 규모</p>
     <h2 class="md a">글로벌 반도체 시장</h2>
@@ -321,7 +402,7 @@
   </div>
 
   <!-- 5. KEY TRENDS -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-dots"
        data-notes="현재 반도체 산업을 움직이는 4대 트렌드입니다. 첫째, AI/HBM — Nvidia가 주도하는 AI 가속기와 HBM 메모리 수요 급증. 둘째, 파운드리 전쟁 — TSMC 대 삼성, 인텔의 3파전. 셋째, 지정학적 갈등 — 미중 반도체 전쟁으로 공급망 재편. 넷째, 전력 문제 — AI 데이터센터의 전력 소비가 새로운 병목으로 등장.">
     <p class="overline a">01 · 현황 — 핵심 트렌드</p>
     <h2 class="md a">반도체 산업을 바꾸는 4가지 힘</h2>
@@ -358,7 +439,7 @@
   </div>
 
   <!-- 6. PLAYER MAP -->
-  <div class="slide slide-tile"
+  <div class="slide slide-tile bg-hex"
        data-notes="글로벌 반도체 플레이어 지형도입니다. Nvidia가 AI 가속기 시장을 사실상 독점하고 있고, TSMC가 첨단 파운드리를 장악하고 있습니다. 메모리는 삼성·SK하이닉스·마이크론 3파전이지만, HBM에서는 SK하이닉스가 앞서 있는 상황입니다.">
     <p class="overline a">01 · 현황 — 플레이어 지형도</p>
     <h2 class="md a">누가 어디서 싸우고 있나</h2>
@@ -405,7 +486,7 @@
   <!-- ─── PART 2: 미래 ─── -->
 
   <!-- 7. FUTURE SECTION -->
-  <div class="slide slide-gradient"
+  <div class="slide slide-gradient bg-dots"
        data-notes="2부, 미래 전망으로 넘어갑니다. 2030년까지 반도체 산업에서 가장 중요한 기술 변화 세 가지를 살펴봅니다.">
     <p class="section-label a">02 · Future</p>
     <h2 class="lg a">2030년까지<br><span class="text-gradient">무엇이 바뀌나</span></h2>
@@ -413,7 +494,7 @@
   </div>
 
   <!-- 8. NEXT-GEN TECH -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-circuit"
        data-notes="차세대 반도체 기술 로드맵입니다. HBM4는 2025~2026년에 양산되며 대역폭이 HBM3E 대비 2배 이상 향상될 것으로 예상됩니다. 2nm 공정은 TSMC와 삼성이 2025~2026년 양산 경쟁 중입니다. PIM(Processing In Memory)은 메모리 안에서 연산을 처리해 데이터 이동을 줄이는 혁신 기술입니다.">
     <p class="overline a">02 · 미래 — 기술 로드맵</p>
     <h2 class="md a">차세대 기술 3가지</h2>
@@ -443,7 +524,7 @@
   </div>
 
   <!-- 9. AI ERA METRICS -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-dots"
        data-notes="AI 반도체 시대의 핵심 숫자들입니다. AI 반도체 시장은 2030년까지 연평균 30% 이상 성장이 예상됩니다. 데이터센터 투자 규모도 급격히 증가하고 있습니다. 중요한 것은 단순 메모리 수요가 아니라 AI에 최적화된 특수 반도체 수요라는 점입니다.">
     <p class="overline a">02 · 미래 — AI 반도체 시장</p>
     <h2 class="md a">AI가 만드는 새로운 수요</h2>
@@ -475,7 +556,7 @@
   <!-- ─── PART 3: 삼성의 길 ─── -->
 
   <!-- 10. SAMSUNG SECTION -->
-  <div class="slide slide-gradient"
+  <div class="slide slide-gradient bg-rings"
        data-notes="3부, 삼성의 전략 방향으로 넘어갑니다. 삼성은 현재 매우 중요한 기로에 서 있습니다. 세계 최대 메모리 반도체 기업이지만, AI 시대에 필요한 HBM과 첨단 파운드리에서 뒤처지고 있습니다. 이 위기를 어떻게 돌파할 것인가를 살펴보겠습니다.">
     <p class="section-label a">03 · Samsung</p>
     <h2 class="lg a">삼성이<br><span class="text-green">나아가야 할 길</span></h2>
@@ -483,7 +564,7 @@
   </div>
 
   <!-- 11. SAMSUNG STATUS -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-diagonal"
        data-notes="삼성의 현재 위치와 도전 과제입니다. 메모리 세계 1위라는 타이틀은 유지하고 있지만, 세 가지 구조적 위기에 직면해 있습니다. HBM 시장에서의 열세, 파운드리 수율 문제, 그리고 AI 반도체 생태계에서의 소외입니다.">
     <p class="overline a">03 · 삼성 — 현재 위치</p>
     <h2 class="md a">메모리 1위, <span class="text-warning">3가지 위기</span></h2>
@@ -542,7 +623,7 @@
   </div>
 
   <!-- 13. 3 STRATEGIES -->
-  <div class="slide slide-tile"
+  <div class="slide slide-tile bg-diagonal"
        data-notes="삼성이 나아가야 할 3대 핵심 전략입니다. 첫째, HBM 리더십 탈환 — HBM4 양산에서 반드시 SK하이닉스보다 앞서거나 동등한 품질을 확보해야 합니다. 둘째, 파운드리 선택과 집중 — 모든 공정을 쫓지 말고 AI 특화 공정에 집중 투자. 셋째, AI 반도체 내재화 — 자체 NPU 설계 역량을 키우고 소프트웨어 생태계를 구축해야 합니다.">
     <p class="overline a">03 · 삼성 — 3대 전략</p>
     <h2 class="md a">삼성이 나아가야 할 길</h2>
@@ -569,7 +650,7 @@
   </div>
 
   <!-- 14. FLOW — Samsung Action Plan -->
-  <div class="slide slide-gradient"
+  <div class="slide slide-gradient bg-diagonal"
        data-notes="삼성의 실행 순서입니다. 당장 해야 할 일은 HBM 품질 회복입니다. 그 다음 파운드리 수율을 안정화하고, 중장기적으로 AI 칩 생태계를 구축하는 순서입니다. 모든 것을 동시에 할 수 없기 때문에 우선순위가 중요합니다.">
     <p class="section-label a">실행 로드맵</p>
     <h2 class="lg a">지금 당장 해야 할 것</h2>
@@ -603,7 +684,7 @@
   </div>
 
   <!-- 15. QUOTE -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-dots"
        data-notes="마무리 메시지입니다. 삼성은 위기에 처해있지만, 이 회사가 과거에도 여러 번의 위기를 돌파해온 것을 기억해야 합니다. 1997년 IMF 위기, 2008년 금융위기, 스마트폰 전환기... 그때마다 기술에 집중해 반전을 이뤄냈습니다. AI 반도체 시대도 그럴 수 있습니다. 단, 지금 당장 결단해야 합니다.">
     <div style="font-size:56px;margin-bottom:28px;" class="a">💎</div>
     <blockquote class="big-quote text-gradient a">
@@ -613,7 +694,7 @@
   </div>
 
   <!-- 16. CLOSING -->
-  <div class="slide slide-dark"
+  <div class="slide slide-dark bg-circuit"
        data-notes="이것으로 발표를 마칩니다. 요약하면 — AI가 반도체 판을 다시 짜고 있고, 삼성은 HBM 리더십 탈환, 파운드리 선택과 집중, AI 칩 내재화 3가지에 집중해야 합니다. 감사합니다.">
     <p class="overline a">반도체 트렌드와 삼성의 미래</p>
     <h1 class="xl text-gradient a">감사합니다.</h1>
